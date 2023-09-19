@@ -1,6 +1,7 @@
 import express from "express" // importamos el modulo "express" para poder usar sus metodos.
 import { __dirname } from "./utils.js";//importamos la variable "__dirname" que va servir como punto de acceso a los arch. desde "src"
 import path from "path";
+import { productsService } from "./persistence/index.js";
 
 import {engine} from "express-handlebars";
 import {Server} from "socket.io";
@@ -12,6 +13,9 @@ import { viewsRouter } from "./routes/views.routes.js";//importamos las rutas de
 const port = 8080; //creamos el puerto de acceso, donde se va ejecutar el servidor.
 
 const app = express(); //creamos el servidor. Aca tenemos todas las funcionalidades que nos ofrece el modulo "express".
+
+//middleware para hacer accesible la carpeta "public" para todo el proyecto.
+app.use(express.static(path.join(__dirname,"/public")));
 
 //configuramos websockets del lado del servidor (backend), vinculando el servidor http con el servidor de websocket.
 //servidor de http
@@ -32,9 +36,13 @@ app.use(viewsRouter); //contiene rutas de tipo GET, porque son las que van a uti
 app.use("/api/products",productsRouter);
 app.use("/api/carts",cartsRouter);
 
+//socket server- enviamos del servidor al cliente los productos creados hasta el momentopermitimos una actualizacion 
+//automatica de los productos creados. Y tambien importamos "productService" para disponer de los productos.
+io.on("connection", async (socket)=> {
+    
+    const products = await productsService.getProducts();
+    socket.emit("productsArray", products)
+    console.log("cliente conectado")
+})
 
 
-//convertimos los archivos contenidos en la carpeta "public", osea de acceso publico para los clientes.
-// app.use(express.static("public"));
-
-//Estas 2 lineas codigo nos permiten convertir la info. (recibida en las peticiones) a formato json.
