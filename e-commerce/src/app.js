@@ -39,10 +39,23 @@ app.use("/api/carts",cartsRouter);
 //socket server- enviamos del servidor al cliente los productos creados hasta el momentopermitimos una actualizacion 
 //automatica de los productos creados. Y tambien importamos "productService" para disponer de los productos.
 io.on("connection", async (socket)=> {
-    
+
     const products = await productsService.getProducts();
     socket.emit("productsArray", products)
     console.log("cliente conectado")
-})
+
+//Recibimos los productos desde el socket del cliente.
+    socket.on("addProduct",async (productData) =>{
+        //creamos los productos
+        const createProduct = await productsService.createProduct(productData);
+        //obtenemos los productos
+        const products = await productsService.getProducts(createProduct);
+        //mostramos los productos
+        socket.emit("productsArray", products)
+    })
+});
+
+
+
 
 

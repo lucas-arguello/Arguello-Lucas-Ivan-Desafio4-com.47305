@@ -86,5 +86,15 @@
 		"stock": 8,
 		"status": true,
 		"category": "mueble de madera de roble"
+	},
+	{
+		"id": 9,
+		"title": "Banqueta matera",
+		"description": "banqueta forrada con pana, 0.30mts x 0.50mts",
+		"price": 1800,
+		"thumbnail": "sin img",
+		"code": "pil365",
+		"stock": 10,
+		"category": "mueble de pino"
 	}
 ]
