@@ -23,7 +23,9 @@ createProductForm.addEventListener("submit",(e)=>{
     }; 
     jsonData.stock = parseInt(jsonData.stock);
     jsonData.price = parseInt(jsonData.price);
+    
     console.log(jsonData);
+
     //ahora enviamos la info del formulario (jsonData) al socket del servidor
     socketClient.emit("addProduct", jsonData);
     //con el metodo "reset" hacemos vacios los campos una vez enviado el producto.
@@ -43,9 +45,29 @@ socketClient.on("productsArray", (dataProdcuts) => {
         productsElems+= 
         ` <li>
                 <p>Nombre : ${prod.title}</p>
+                <p>Descripcion: ${prod.description}</p>
+                <p>Precio: ${prod.price}</p>
+                <p>Codigo: ${prod.code}</p>
+                <p>imagen: ${prod.thumbnail}</p>
+                <p>Stock: ${prod.stock}</p>
+                <p>Categoria: ${prod.category}</p> 
+                <button class="deleteProduct" data-id="${prod.id}">Eliminar</button>
           </li> `
           //console.log(productsElems);
           });
     //inserto la lista de productos en el HTML de "realtime.hbs"      
     productList.innerHTML= productsElems;
+});
+
+//enviamos la info del form al socket del servidor para eliminar un producto
+document.addEventListener('click', function (e) {
+    //verifico que en el click reciba la clase deleteProduct
+    if (e.target) {
+        if (e.target.classList.contains('deleteProduct')) {
+            //obtengo el id del producto
+            const prodId = parseInt(e.target.dataset.id);
+            //envio el id al socket para ser eliminado
+            socketClient.emit('deleteProduct', prodId);
+        }
+    }
 });

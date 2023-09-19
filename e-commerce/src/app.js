@@ -39,20 +39,50 @@ app.use("/api/carts",cartsRouter);
 //socket server- enviamos del servidor al cliente los productos creados hasta el momentopermitimos una actualizacion 
 //automatica de los productos creados. Y tambien importamos "productService" para disponer de los productos.
 io.on("connection", async (socket)=> {
-
-    const products = await productsService.getProducts();
-    socket.emit("productsArray", products)
     console.log("cliente conectado")
+
+    try{
+        //Obtengo los productos 
+        const products = await productsService.getProducts();
+        //y los envio al cliente
+        socket.emit("productsArray", products)
+
+        } catch (error) {
+            console.log('Error al obtener los productos', error.message);
+            
+        }
+    
 
 //Recibimos los productos desde el socket del cliente.
     socket.on("addProduct",async (productData) =>{
-        //creamos los productos
-        const createProduct = await productsService.createProduct(productData);
-        //obtenemos los productos
-        const products = await productsService.getProducts(createProduct);
-        //mostramos los productos
-        socket.emit("productsArray", products)
-    })
+        try{    
+            //creamos los productos
+            const createProduct = await productsService.createProduct(productData);
+            //obtenemos los productos
+            const products = await productsService.getProducts();
+            //mostramos los productos
+            io.emit("productsArray", products)
+
+        } catch (error) {
+            console.error('Error al crear un producto:', error.message);
+        }    
+    });
+
+//Eliminamos los produtos.
+
+    socket.on('deleteProduct', async (productId) => {
+        try {
+            // Eliminar el producto de la lista de productos por su ID
+            await productsService.deleteProduct(productId);
+            // Obtener la lista actualizada de productos
+            const updatedProducts = await productsService.getProducts();
+            // Emitir la lista actualizada de productos al cliente
+            socket.emit('productsArray', updatedProducts);
+        } catch (error) {
+            // Manejar errores, por ejemplo, si el producto no se encuentra
+            console.error('Error al eliminar un producto:', error.message);
+        }
+    });
 });
 
 
