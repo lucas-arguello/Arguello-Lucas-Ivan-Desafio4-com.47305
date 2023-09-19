@@ -3,7 +3,6 @@ import {Router} from "express";//importamos "routes" desde la libreria de expres
 import { productsService } from "../persistence/index.js";//importamos la instancia del Manager de productos, para poder usar los diferentes metodos que definimos dentro de la clase.
 
 
-
 const router = Router();
 
 
